@@ -1,0 +1,58 @@
+<h1 id="chapter-2-getting-started">Chapter 2 -- Getting started</h1>
+<h2 id="2122-instaling-ros">2.1~2.2 Instaling ROS</h2>
+<hr />
+<h3 id="setup-your-sourceslist"><strong><em>Setup your sources.list</em></strong></h3>
+<p>Ubuntu 14.04</p>
+<pre><code>sudo sh -c 'echo &quot;deb http://packages.ros.org/ros/ubuntu trusty main&quot; &gt; /etc/apt/sources.list.d/ros-latest.list'
+</code></pre>
+
+<p>the <em>trusty</em> is the codename of Ubuntu14.04, if you are unsure of which Ubuntu version you're using, you can find out using this command </p>
+<pre><code>lsb_release -a
+</code></pre>
+
+<h3 id="setup-your-keys"><strong><em>Setup your keys</em></strong></h3>
+<pre><code>wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+
+</code></pre>
+
+<p>after completing this step (apt-key should say "OK"), you can safely delete ros.key.</p>
+<h3 id="downloading-the-package-lists"><strong><em>Downloading the package lists</em></strong></h3>
+<pre><code>sudo apt-get update
+</code></pre>
+
+<h3 id="installing-the-ros-packages"><strong><em>Installing the ROS packages</em></strong></h3>
+<pre><code>sudo apt-get install ros-indigo-desktop-full
+</code></pre>
+
+<p>To find available packages, use</p>
+<blockquote>
+<p><code>apt-cache search ros-indigo</code></p>
+</blockquote>
+<h3 id="initialize-rosdep"><strong><em>Initialize rosdep</em></strong></h3>
+<p>Before you can use ROS, you will need to initialize rosdep. rosdep enables you to easily install system dependencies for source you want to compile and is required to run some core components in ROS.</p>
+<pre><code>sudo rosdep init
+</code></pre>
+
+<p>The purpose of this command is to initialize rosdep, checking and instaling package dependencies in an OS-independent way.</p>
+<p>Then, you must initialize the rosdep system in you account, using this command</p>
+<pre><code>rosdep update
+</code></pre>
+
+<p>Note that, the above command should be run using your normal user account, not using <em>sudo</em>.</p>
+<h3 id="environment-setup"><strong><em>Environment setup</em></strong></h3>
+<p>It's convenient if the ROS environment varialbles are automatically added to your bash session every time a new shell is launched:</p>
+<pre><code>echo &quot;source /opt/ros/indigo/setup.bash&quot; &gt;&gt; ~/.bashrc
+
+source ~/.bashrc
+</code></pre>
+
+<p>You can then confirm that the environment variable are set correctly using a command like this:</p>
+<pre><code>export | grep ROS
+</code></pre>
+
+<h3 id="getting-rosinstall"><strong><em>Getting rosinstall</em></strong></h3>
+<p>rosinstall is a frequently used command-line tool is ROS that is distributed separately. To install this tool on Ubuntu, run:</p>
+<pre><code>sudo apt-get install python-rosinstall
+</code></pre>
+
+<hr />
