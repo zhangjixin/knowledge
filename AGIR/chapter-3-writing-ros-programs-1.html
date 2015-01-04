@@ -1,0 +1,223 @@
+<h1 id="chapter-3-writing-ros-programs">Chapter 3 -- Writing ROS programs</h1>
+<h2 id="31-creating-a-workspace-and-a-package">3.1 Creating a workspace and a package</h2>
+<hr />
+<h3 id="creating-a-workspace"><strong><em>Creating a workspace</em></strong></h3>
+<p>Before we write any programs, the first steps are to create a workspace to hold out packages, and then to create the package itself.</p>
+<h4 id="creating-a-workspace_1"><strong><em>Creating a workspace</em></strong></h4>
+<p>Packages that you create should live together in a directory called a <strong>workspace</strong>. Use the normal <em>mkdir</em> command to create a directory. We'll refer to this new directory as your <strong>workspace directory</strong>.</p>
+<p>One final step is needed to set up the workspace. Create a subdirectory called <em>src</em> inside the workspace directory.</p>
+<h4 id="creating-a-package"><strong><em>Creating a package</em></strong></h4>
+<p>The command to create a new ROS package, which should be run form the src directory of your workspace, looks like this :</p>
+<pre><code>catkin_create_pkg package-name
+</code></pre>
+
+<p>It creates a directory to hold the package and creates two configuration files (package.xml and CMakeLists.txt) inside that directory.</p>
+<h4 id="editing-the-manifest"><strong><em>Editing the manifest</em></strong></h4>
+<p>The following content shows the manifest from our agitr package.</p>
+<pre><code>&lt;?xml version = &quot;1.0&quot;?&gt;
+&lt;package&gt;
+    &lt;name&gt;agitr&lt;/name&gt;
+    &lt;version&gt;0.01&lt;/version&gt;
+    &lt;description&gt;
+        Example from A Gentle Introduction to ROS
+    &lt;/description&gt;
+    &lt;maintainer email=&quot;jokane@cse.sc.edu&quot;&gt;
+        Jason O'Kane
+    &lt;/maintainer&gt;
+    &lt;license&gt;TODO&lt;/license&gt;
+    &lt;buildtool_depend&gt;catkin&lt;/buildtool_depend&gt;
+    &lt;build_depend&gt;geometry_msgs&lt;/build_depend&gt;
+    &lt;run_depend&gt;geometry_msgs&lt;/run_depend&gt;
+    &lt;build_depend&gt;turtlesim&lt;/build_depend&gt;
+    &lt;run_depend&gt;turtlesim&lt;/run_depend&gt;
+&lt;/package&gt;
+</code></pre>
+
+<h2 id="32-helloros">3.2 Hello,ROS!</h2>
+<hr />
+<h3 id="a-simple-program"><strong><em>A simple program</em></strong></h3>
+<p>hello.cpp</p>
+<pre><code>//This header defines the standard ROS classes.
+#include &lt;ros/ros.h&gt;
+int main(int argc, char **argv) {
+    //Initialize the ROS system.
+    ros::init(argc, argv, &quot;hello_ros&quot;);
+    //Establish this program as a ROS node
+    ros::NodeHandle nh;
+    //send some output as a log message
+    ROS_INFO_STREAM(&quot;Hello, ROS&quot;);
+}
+</code></pre>
+
+<h3 id="compiling-the-hello-program"><strong><em>Compiling the Hello program</em></strong></h3>
+<p>four steps</p>
+<p><strong>One.</strong> Declaring dependencies</p>
+<p>To list dependencies, edit the CMakeLists.txt. The default version of this file has this line:</p>
+<pre><code>find_package(catkin REQUIRED)
+</code></pre>
+
+<p>Dependencies on other catkin packages can be added in a COMPONENTS section :</p>
+<pre><code>find_package(catkin REQUIRED COMPONENTS package-names)
+</code></pre>
+
+<p>For the hello example, we need one dependency on a package called <em>roscpp</em>:</p>
+<pre><code>find_package(catkin REQUIRED COMPONENTS roscpp)
+</code></pre>
+
+<p>We should also list dependencies in the package manifest(package.xml), using the build_depend and run_depend elements:</p>
+<pre><code>&lt;build_depend&gt; package-name&lt;/build_depend&gt;
+&lt;run_depend&gt;package-name&lt;/run_depend&gt;
+</code></pre>
+
+<p>In our example:</p>
+<pre><code>&lt;build_depend&gt;roscpp&lt;/build_depend&gt;
+&lt;run_depend&gt;roscpp&lt;/run_depend&gt;
+</code></pre>
+
+<p><strong>Two.</strong> Declaring an executable
+we need to add two lines to CMakeLists.txt declaring the excutable we would like to create.</p>
+<pre><code>add_executable(executable-name source-files)
+
+target_link_libraries(executable-name ${catkin_LIBRARIES})
+</code></pre>
+
+<p>In our example, we should add these two lines to CMakeLists.txt:</p>
+<pre><code>add_executable(hello hello.cpp)
+target_link_libraries(hello ${catkin_LIBRARIES})
+</code></pre>
+
+<p>example:</p>
+<pre><code>cmake_minimum_required(VERSION 2.8.3)
+project(agitr)
+
+## Find catkin macros and libraries
+find_package(catkin REQUIRED COMPONENTS roscpp)
+
+#declare our catkin package
+catkin_package()
+
+#specify locations of header files
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+#declare the executable, along with its source files
+add_executable(hello hello.cpp)
+
+#specify libraries against which to link
+target_link_libraries(hello ${catkin_LIBRARIES})
+
+</code></pre>
+
+<p><strong>Three.</strong> Building the workspace
+You can build your workspace-including compiling all of the executables in all of its packages-using this command:</p>
+<pre><code>catkin_make
+</code></pre>
+
+<p>Because it's designed to build all of the packages in your workspace, this command must be run from your workspace directory.</p>
+<p>It will perform several configuration steps and create subdirectories called <em>devel</em> and <em>build</em> within your workspace.</p>
+<p><em>Four.</em> Sourcing setup.bash
+The final step is to execute a script called <em>setup.bash</em>, which is created by <em>catkin_make</em> inside the devel subdirectory of your workspace:</p>
+<pre><code>source devel/setup.bash
+</code></pre>
+
+<p>This automatically-generated script sets several environment variables theat enable ROS to find your package and its newly-generated executables.</p>
+<h3 id="executing-the-hello-program"><strong><em>Executing the hello program</em></strong></h3>
+<p>using the command <em>rosrun</em> to execute the hello program:</p>
+<pre><code>rosrun agitr hello
+</code></pre>
+
+<p>Don't forget to start roscore first: This program is a node, and nodes need a master to run correctly.</p>
+<p>The program should produce output that looks something like this:</p>
+<pre><code>[INFO][1416432122.659693753]:Hello, ROS!
+</code></pre>
+
+<h2 id="33-a-publisher-program">3.3 A publisher program</h2>
+<p>The main differences between pubvel and hello all stem from the need to publish messages.</p>
+<p>pubvel.cpp</p>
+<pre><code>#include &lt;ros/ros.h&gt;
+#include &lt;geometry_msgs/Twist.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(int argc, char **argv) {
+    //initialize the ROS system and become a node
+    ros::init(argc, argv, &quot;publish_velocity&quot;);
+    ros::NodeHandle nh;
+    //create a publisher object
+    ros::Publisher pub = nh.advertise&lt;geometry_msgs::Twist&gt;(&quot;turtlel/cmd_vel&quot;,1000);
+    //seed the random number generator
+    srand(time(0));
+    //look at 2Hz until the node is shut down
+    ros::Rate rate(2);
+    while(ros::ok() ) {
+        //create and fill in the message.
+        geometry_msgs::Twist msg;
+        msg.linear.x = double(rand())/double(RAND_MAX);
+        msg.angular.z = 2*double(rand())/double(RAND_MAX) - 1;
+        //publish the message
+        pub.publish(msg);
+        //send a message to rosout with the details
+        ROS_INFO_STREAM(&quot;sending random velocity command:&quot;
+                &lt;&lt; &quot; linear=&quot; &lt;&lt; msg.linear.x
+                &lt;&lt; &quot; angular=&quot; &lt;&lt; msg.angular.z);
+        //wait until it's time for another iteration
+        rate.sleep();
+    }
+}
+
+</code></pre>
+
+<h3 id="publishing-messages"><strong><em>Publishing messages</em></strong></h3>
+<h4 id="including-the-message-type-declaration"><strong><em>Including the message type declaration</em></strong></h4>
+<pre><code>#include &lt;package_name/type_name.h&gt;
+</code></pre>
+
+<h4 id="creating-a-publisher-object"><strong><em>Creating a publisher object</em></strong></h4>
+<pre><code>ros::Publisher pub = node_handle.advertise&lt;message_type&gt;(topic_name, queue_size);
+</code></pre>
+
+<h4 id="creating-and-filling-in-the-message-object"><strong><em>Creating and filling in the message object</em></strong></h4>
+<p>geometry_msgs/Twist message type has two top-level fields(liner and angular), each of which contains three sub-fields(x, y and z). Each of these sub-fields is a 64bit floating point number, called a double by most c++ compilers.</p>
+<pre><code>geometry_msgs::Twist msg;
+msg.linear.x = double(rand())/double(RAND_MAX);
+msg.angular.z = 2*double(rand())/double(RAND_MAX)-1;
+</code></pre>
+
+<h4 id="publishing-the-message"><strong><em>Publishing the message</em></strong></h4>
+<pre><code>pub.publish(msg);
+</code></pre>
+
+<h3 id="the-publishing-loop"><strong><em>The publishing loop</em></strong></h3>
+<h4 id="checking-for-node-shutdown"><strong><em>Checking for node shutdown</em></strong></h4>
+<p>The condition of pubvel's while loop is:</p>
+<pre><code>ros::ok()
+</code></pre>
+
+<h4 id="controlling-the-publishing-rate"><strong><em>Controlling the publishing rate</em></strong></h4>
+<pre><code>ros::Rate rate(2);
+</code></pre>
+
+<p>This object controls how rapidly the loop runs. The parameter in its constructor is in units of Hz, that is, in cycles per second.</p>
+<p>Near the end of each loop iteration, we call the sleep method of this object:</p>
+<pre><code>rate.sleep();
+</code></pre>
+
+<p>Each call of the this method causes a delay in the program.</p>
+<h3 id="compiling-pubvel"><strong><em>Compiling pubvel</em></strong></h3>
+<p>In CMakeLists.txt </p>
+<pre><code>find_package(catkin REQUIRED COMPONENTS roscpp geometry_msgs)
+</code></pre>
+
+<p>Note that we are modifying the existing find_package line, rather than creating a new one.</p>
+<p>In package.xml</p>
+<pre><code>&lt;build_depend&gt;geometry_msgs&lt;/build_depend&gt;
+&lt;run_depend&gt;geometry_msgs&lt;/run_depend&gt;
+</code></pre>
+
+<h3 id="executing-pubvel"><strong><em>Executing pubvel</em></strong></h3>
+<pre><code>rosrun agitr pubvel
+</code></pre>
+
+<p>You'll also want to run a turtlesim simulator, so that you can see the turtle respond to the motion commands that pubvel publishes:</p>
+<pre><code>rosrun turtlesim turtlesim_node
+</code></pre>
+
+<hr />
