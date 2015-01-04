@@ -235,8 +235,13 @@ In package.xml
 <build_depend>geometry_msgs</build_depend>
 <run_depend>geometry_msgs</run_depend>
 ```
+Then
+```
+catkin_make
+```
 ###**_Executing pubvel_**
 ```
+source devel/setup.bash
 rosrun agitr pubvel
 ```
 You'll also want to run a turtlesim simulator, so that you can see the turtle respond to the motion commands that pubvel publishes:
