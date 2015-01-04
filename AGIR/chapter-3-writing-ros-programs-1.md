@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "publish_velocity");
     ros::NodeHandle nh;
     //create a publisher object
-    ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("turtlel/cmd_vel",1000);
+    ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("turtle1/cmd_vel",1000);
     //seed the random number generator
     srand(time(0));
     //look at 2Hz until the node is shut down
