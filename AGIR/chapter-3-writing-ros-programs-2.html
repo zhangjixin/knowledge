@@ -1,0 +1,60 @@
+<h1 id="chapter-3-writing-ros-programs">Chapter 3 -- Writing ROS programs</h1>
+<h2 id="34-a-subscriber-program">3.4 A subscriber program</h2>
+<hr />
+<p>We will subscribe to the /turtle/pose topic, on which turtlesim_node publishes.
+An example: <em>subpose.cpp</em></p>
+<pre><code>// This program subscribes to turtle1/pose and shows its messages on the screen.
+#include &lt;ros/ros.h&gt;
+#include &lt;turtlesim/Pose.h&gt;
+#include &lt;iomanip&gt; // for std::setprecision and std::fixed
+
+// a callback function. executed each time a new pose message arrives.
+void poseMessageReceived(const turtlesim::Post&amp; msg) {
+    ROS_INFO_STREAM(std::setprecision(2) &lt;&lt; std::fixed &lt;&lt; &quot;Position=(&quot; &lt;&lt; msg.x &lt;&lt; &quot;,&quot; &lt;&lt; msg.y &lt;&lt;&quot;)&quot; &lt;&lt; &quot; direction=&quot; &lt;&lt; msg.theta);
+}
+
+int main(int argc, chr **argv) {
+    //initialize the ROS system and become a node
+    ros::init(argc, argv, &quot;subscribe_to_pose&quot;);
+    ros::NodeHandle nh;
+
+    //create a subscriber object
+    ros::Subscriber sub = nh.subscribe(&quot;turtle1/pose&quot;, 1000, &amp;poseMessageReceived);
+    //let ROS take over
+    ros::spin();
+}
+
+</code></pre>
+
+<h3 id="writing-a-callback-function"><strong><em>writing a callback function</em></strong></h3>
+<p>A subscriber node doesn't know when message will arive. To deal with this fact, we must implement a <strong>callback function</strong>, which ROS calls once for each arriving message.</p>
+<pre><code>void function_name(const package_name::type_name &amp;msg) {
+    ...
+}
+</code></pre>
+
+<p>Node that subscriber callback function have a void return value.</p>
+<h3 id="creating-a-subscriber-object"><strong><em>Creating a subscriber object</em></strong></h3>
+<p>To subscribe to a object, we create a ros::Subscriber object:</p>
+<pre><code>ros::Subscriber sub = node_handle.subscribe(topic_name, queue_size, pointer_to_callback_function);
+</code></pre>
+
+<h3 id="giving-ros-contrl"><strong><em>Giving ROS contrl</em></strong></h3>
+<p>ROS will only execute our callback function when we give it explicit permission to do so. There are actually two slightly different ways to accomplish this:</p>
+<pre><code>ros::spinOnce();
+</code></pre>
+
+<p>The other option looks like this:</p>
+<pre><code>ros::spin();
+</code></pre>
+
+<p>this function is roughly equivalent to this loop:</p>
+<pre><code>while(ros::ok()) {
+    ros::spinOnce();
+}
+</code></pre>
+
+<h3 id="compiling-and-executing-subpose"><strong><em>Compiling and executing subpose</em></strong></h3>
+<p>Modify CMakeLists.txt and package.xml, then compiling subpose.cpp.</p>
+<p>When both turtlesim_node and pubvel were running, you can see a sample of this program's output.</p>
+<hr />
